@@ -14,12 +14,14 @@ const char *password = "etecPeine3";
 const int port = 5000;
 const int OK_CODE = 200;
 const int NOT_FOUND_CODE = 404;
-
+bool llueve   = false;
 
 WebServer server(port);
 
 unsigned long ultimoTiempo = 0;
 const long tiempoEspera = 3000;
+
+bool guardado=false;
 
 void setup() {
  Serial.begin(115200);
@@ -55,19 +57,12 @@ void recibirClima()
  Serial.println(body);
  JsonDocument doc;
  deserializeJson(doc,body);
- bool llueve = doc["llueve"];
+ llueve = doc["llueve"];
  Serial.print("Llueve?:");
  Serial.println(llueve);
  int valor_sensor = analogRead(sensorPin);
  Serial.print("Valor sensor de agua: ");
  Serial.println(valor_sensor);
- if (llueve || valor_sensor>=100) {
-   servo.write(90);
-   Serial.println("Ropa guardada");
- } else {
-   servo.write(0);
-   Serial.println("Ropa afuera");
- }
  server.send(OK_CODE, "text/html","<h1>OK</h1>"); //MIME TYPES
 }
 
@@ -83,7 +78,24 @@ void loop() {
   int valor_sensor = analogRead(sensorPin);
  if (WiFi.status() == WL_CONNECTED) {
    server.handleClient();
-} else {
+    int valor_sensor = analogRead(sensorPin);
+   Serial.print("Valor sensor de agua: ");
+   Serial.println(valor_sensor);
+ if (llueve || valor_sensor>=100) {
+     if(!guardado) {
+        guardado=true;
+        servo.write(90);
+        Serial.println("Ropa guardada");
+     }
+  } else {
+    if (guardado) {
+      guardado=false;
+      servo.write(0);
+      Serial.println("Ropa afuera");
+    }
+ }
+
+ } else {
    Serial.println("Se desconectó del wifi");
 }
 }
