@@ -6,6 +6,7 @@
 
 const int servoPin = 32;
 const int sensorPin = 33;
+
 Servo servo;
 
 const char *ssid = "PEINE-3";
@@ -13,6 +14,7 @@ const char *password = "etecPeine3";
 const int port = 5000;
 const int OK_CODE = 200;
 const int NOT_FOUND_CODE = 404;
+
 
 WebServer server(port);
 
@@ -56,10 +58,15 @@ void recibirClima()
  bool llueve = doc["llueve"];
  Serial.print("Llueve?:");
  Serial.println(llueve);
- if (llueve) {
+ int valor_sensor = analogRead(sensorPin);
+ Serial.print("Valor sensor de agua: ");
+ Serial.println(valor_sensor);
+ if (llueve || valor_sensor>=100) {
    servo.write(90);
+   Serial.println("Ropa guardada");
  } else {
    servo.write(0);
+   Serial.println("Ropa afuera");
  }
  server.send(OK_CODE, "text/html","<h1>OK</h1>"); //MIME TYPES
 }
@@ -73,6 +80,7 @@ void noEncontrada()
 
 
 void loop() {
+  int valor_sensor = analogRead(sensorPin);
  if (WiFi.status() == WL_CONNECTED) {
    server.handleClient();
 } else {
