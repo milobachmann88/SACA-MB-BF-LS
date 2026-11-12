@@ -16,6 +16,8 @@ const int OK_CODE = 200;
 const int NOT_FOUND_CODE = 404;
 bool llueve   = false;
 
+const int tiempoMovimiento=1500/9;
+
 WebServer server(port);
 
 unsigned long ultimoTiempo = 0;
@@ -81,6 +83,7 @@ void loop() {
     int valor_sensor = analogRead(sensorPin);
    Serial.print("Valor sensor de agua: ");
    Serial.println(valor_sensor);
+   delay(500);
  if (llueve || valor_sensor>=100) {
      if(!guardado) {
         guardado=true;
